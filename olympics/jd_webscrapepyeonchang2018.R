@@ -41,7 +41,7 @@ scrape.export.medals <- function() {
   medals_table <- html_table(html_nodes(medals, "table")[[1]], fill = TRUE)
   
   # Rename Columns
-  names(medals_table) <- c("Rank","NOC",
+  names(medals_table) <- c("Rank","City",
                            "Gold_M","Gold_F","Gold_X","Gold_T",
                            "Silver_M","Silver_F","Silver_X","Silver_T",
                            "Bronze_M","Bronze_F","Bronze_X","Bronze_T",
