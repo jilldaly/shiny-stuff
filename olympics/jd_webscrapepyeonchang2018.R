@@ -1,5 +1,5 @@
 ##############################################################################
-#                         WebScrape Pyeonchange 2018                         #
+#                         WebScraperv - Pyeonchang 2018                      #
 #                                 Jill Daly                                  #
 #                                  22/3/18                                   #
 ##############################################################################
@@ -39,7 +39,20 @@ if (!dir.exists(data_folder)){
 scrape.export.medals <- function() {
   medals <- read_html(medal_detail_URL)
   medals_table <- html_table(html_nodes(medals, "table")[[1]], fill = TRUE)
-  write.csv(medals_table, file = medals_filename)
+  
+  # Rename Columns
+  names(medals_table) <- c("Rank","NOC",
+                           "Gold_M","Gold_F","Gold_X","Gold_T",
+                           "Silver_M","Silver_F","Silver_X","Silver_T",
+                           "Bronze_M","Bronze_F","Bronze_X","Bronze_T",
+                           "Total_M","Total_F","Total_X","Total_T",
+                           "RankbyTotal")
+  
+  # Remove the first row as it's a duplicate header     
+  medals_table <- medals_table[-1,]
+
+  # Write the df to csv  
+  write.csv(medals_table, file = medals_filename, row.names = FALSE)
 }
 
 
