@@ -18,18 +18,18 @@ for (package in c("rvest", "magrittr", "lubridate")) {
 ##############################################################################
 #                         Strings Used                                       #
 ##############################################################################
-data_folder <- "olympics2018"
+olympics_folder <- "olympics_vis"
 medal_detail_URL <- "https://www.pyeongchang2018.com/en/game-time/results/OWG2018/en/general/detailed-medal-standings-.htm"
 medallists_URL <- "https://www.pyeongchang2018.com/en/game-time/results/OWG2018/en/general/daily-medallists-date=2018-02-day.htm"
-medals_filename <- paste(data_folder, "pyeonchang_medals_table.csv", sep = "/")
-medallists_filename <- paste(data_folder, "pyeonchang_medallists.csv", sep = "/")
+medals_filename <- paste(olympics_folder, "pyeongchang_medals_table.csv", sep = "/")
+medallists_filename <- paste(olympics_folder, "pyeongchang_medallists.csv", sep = "/")
 
 
 ##############################################################################
 #         Check if we need to create a dir for the csv files                 #
 ##############################################################################
-if (!dir.exists(data_folder)){
-  dir.create(data_folder)
+if (!dir.exists(olympics_folder)){
+  dir.create(olympics_folder)
 }
 
 
@@ -40,7 +40,7 @@ scrape.export.medals <- function() {
   medals <- read_html(medal_detail_URL)
   medals_table <- html_table(html_nodes(medals, "table")[[1]], fill = TRUE)
   
-  # Rename Columns
+  # Rename Columns so they're unique
   names(medals_table) <- c("Rank","City",
                            "Gold_M","Gold_F","Gold_X","Gold_T",
                            "Silver_M","Silver_F","Silver_X","Silver_T",
@@ -50,7 +50,7 @@ scrape.export.medals <- function() {
   
   # Add year column 
   medals_table %>% mutate(Year = '2018')
-
+  
   # Remove the first row as it's a duplicate header     
   medals_table <- medals_table[-1,]
 
@@ -79,6 +79,7 @@ scrape.medallists <- function(day, m_df) {
   rbind(m_df,  me_tble) 
 } 
 
+
 ##############################################################################
 #                           Main - Call Functions                            #
 ##############################################################################
@@ -90,7 +91,7 @@ medallist_df <- data_frame()
 medallist_df <- do.call(rbind, lapply(c(10:25), scrape.medallists, medallist_df))
 
 # export medallist df
-write.csv(medallist_df, file = medallists_filename)
+write.csv(medallist_df, file = medallists_filename, row.names = FALSE)
 
 
 ##############################################################################
@@ -100,6 +101,5 @@ print('Scrape and Export of Pyeongchang 2018 medals and medallists complete')
 print(paste(medals_filename, 'and', medallists_filename, 'have been created', sep = " "))
 print('Removing variables, removing variables from this script from your R Environment ')
 rm(medal_detail_URL, medallists_URL, medallist_df, package, 
-   scrape.export.medals, scrape.medallists, data_folder,
+   scrape.export.medals, scrape.medallists, olympics_folder,
    medals_filename, medallists_filename)
-
