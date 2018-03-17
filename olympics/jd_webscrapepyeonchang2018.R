@@ -21,8 +21,8 @@ for (package in c("rvest", "magrittr", "lubridate")) {
 data_folder <- "olympics2018"
 medal_detail_URL <- "https://www.pyeongchang2018.com/en/game-time/results/OWG2018/en/general/detailed-medal-standings-.htm"
 medallists_URL <- "https://www.pyeongchang2018.com/en/game-time/results/OWG2018/en/general/daily-medallists-date=2018-02-day.htm"
-medals_filename <- paste(data_folder, "medals_table.csv", sep = "/")
-medallists_filename <- paste(data_folder, "medallists.csv", sep = "/")
+medals_filename <- paste(data_folder, "pyeonchang_medals_table.csv", sep = "/")
+medallists_filename <- paste(data_folder, "pyeonchang_medallists.csv", sep = "/")
 
 
 ##############################################################################
@@ -48,6 +48,9 @@ scrape.export.medals <- function() {
                            "Total_M","Total_F","Total_X","Total_T",
                            "RankbyTotal")
   
+  # Add year column 
+  medals_table %>% mutate(Year = '2018')
+
   # Remove the first row as it's a duplicate header     
   medals_table <- medals_table[-1,]
 
@@ -65,13 +68,16 @@ scrape.medallists <- function(day, m_df) {
 
   # The webpage has two Medal columns, we need to drop the jpg column 
   me_tble <- me_tble[, -c(4)] %>%
-              mutate(Date=dmy(sub('day', day, "day-Feb-2018"))) %>% # Add Date Column
-              separate(Name, c("NOC", "Name"), "   ", extra = "merge") # Sepatate Country and Name
+              mutate(Date=dmy(sub('day', day, "day-Feb-2018")),
+                     City='Pyeonchang') %>% # Add Date Column
+              separate(Name, c("Country", "Athlete"), "   ", extra = "merge") %>% # Separate Country and Name
+              mutate(Event = str_replace(Event, "Ladies'", "Women's")) %>%
+              separate(Event, c("Gender", "Event"), "'s ", extra = "merge" ) %>%
+              mutate(Year = "2018")
 
   # Add this days medallists to the main df
   rbind(m_df,  me_tble) 
 } 
-
 
 ##############################################################################
 #                           Main - Call Functions                            #
