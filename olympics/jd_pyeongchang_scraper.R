@@ -69,12 +69,15 @@ scrape.medallists <- function(day, m_df) {
   # The webpage has two Medal columns, we need to drop the jpg column 
   me_tble <- me_tble[, -c(4)] %>%
               mutate(Date=dmy(sub('day', day, "day-Feb-2018")),
-                     City='Pyeonchang') %>% # Add Date Column
+                     City='Pyeongchang') %>% # Add Date Column
               separate(Name, c("Country", "Athlete"), "   ", extra = "merge") %>% # Separate Country and Name
               mutate(Event = str_replace(Event, "Ladies'", "Women's")) %>%
-              separate(Event, c("Gender", "Event"), "'s ", extra = "merge" ) %>%
+              separate(Event, c("Gender", "Event"), "'s ", fill = "left" , extra = "merge" ) %>%
               mutate(Year = "2018")
-
+    
+  # Any NAs for Gender are due to being Mixed Team Sports
+  me_tble$Gender[is.na(me_tble$Gender)]  <- "Mixed" 
+  
   # Add this days medallists to the main df
   rbind(m_df,  me_tble) 
 } 
